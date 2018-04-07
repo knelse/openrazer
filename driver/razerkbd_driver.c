@@ -384,6 +384,10 @@ static ssize_t razer_attr_read_device_type(struct device *dev, struct device_att
         device_type = "Razer Deathstalker Expert\n";
         break;
 
+    case USB_DEVICE_ID_RAZER_DEATHSTALKER_ULTIMATE:
+        device_type = "Razer Deathstalker Ultimate\n";
+        break;
+            
     case USB_DEVICE_ID_RAZER_DEATHSTALKER_CHROMA:
         device_type = "Razer DeathStalker Chroma\n";
         break;
@@ -794,6 +798,10 @@ static ssize_t razer_attr_write_mode_static(struct device *dev, struct device_at
     switch(usb_dev->descriptor.idProduct) {
     case USB_DEVICE_ID_RAZER_ORBWEAVER:
     case USB_DEVICE_ID_RAZER_DEATHSTALKER_EXPERT:
+        report = razer_chroma_standard_set_led_effect(VARSTORE, BACKLIGHT_LED, 0x00);
+        razer_send_payload(usb_dev, &report);
+        break;
+     case USB_DEVICE_ID_RAZER_DEATHSTALKER_ULTIMATE:
         report = razer_chroma_standard_set_led_effect(VARSTORE, BACKLIGHT_LED, 0x00);
         razer_send_payload(usb_dev, &report);
         break;
@@ -1693,7 +1701,13 @@ static int razer_kbd_probe(struct hid_device *hdev, const struct hid_device_id *
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
             break;
-
+        case USB_DEVICE_ID_RAZER_DEATHSTALKER_ULTIMATE:
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_pulsate);         // Pulsate effect, like breathing
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_static);          // Static effect
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_game_led_state);                // Enable game mode & LED
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
+            CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
+            break;
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_ULTIMATE_2016:
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_X_ULTIMATE:
             CREATE_DEVICE_FILE(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
@@ -1968,7 +1982,13 @@ static void razer_kbd_disconnect(struct hid_device *hdev)
             device_remove_file(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
             device_remove_file(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
             break;
-
+        case USB_DEVICE_ID_RAZER_DEATHSTALKER_ULTIMATE:
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_pulsate);         // Pulsate effect, like breathing
+            device_remove_file(&hdev->dev, &dev_attr_matrix_effect_static);          // Static effect
+            device_remove_file(&hdev->dev, &dev_attr_game_led_state);                // Enable game mode & LED
+            device_remove_file(&hdev->dev, &dev_attr_macro_led_state);               // Enable macro LED
+            device_remove_file(&hdev->dev, &dev_attr_macro_led_effect);              // Change macro LED effect (static, flashing)
+            break;
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_ULTIMATE_2016:
         case USB_DEVICE_ID_RAZER_BLACKWIDOW_X_ULTIMATE:
             device_remove_file(&hdev->dev, &dev_attr_matrix_effect_wave);            // Wave effect
@@ -2199,6 +2219,7 @@ static const struct hid_device_id razer_devices[] = {
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_TARTARUS_CHROMA) },
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_DEATHSTALKER_EXPERT) },
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA) },
+    { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_DEATHSTALKER_ULTIMATE) },
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_BLACKWIDOW_OVERWATCH) },
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_DEATHSTALKER_CHROMA) },
     { HID_USB_DEVICE(USB_VENDOR_ID_RAZER,USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA_TE) },
